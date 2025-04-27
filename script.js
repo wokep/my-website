@@ -1,29 +1,46 @@
-// Wait for the document to load
-document.addEventListener("DOMContentLoaded", () => {
-    const tabs = document.querySelectorAll(".tab");
-    const tabPanels = document.querySelectorAll(".tab-panel");
+// script.js
 
-    // Function to switch tab
-    function switchTab(tabId) {
-        // Hide all tab content panels
-        tabPanels.forEach(panel => panel.classList.remove("active"));
+let balance = 0;
 
-        // Remove 'active' class from all tabs
-        tabs.forEach(tab => tab.classList.remove("active"));
+function updateBalanceDisplay() {
+    document.getElementById('balance').innerText = `$${balance.toLocaleString()}`;
+}
 
-        // Show the selected tab content and set the tab as active
-        document.getElementById(tabId).classList.add("active");
-        document.querySelector(`[data-tab="${tabId}"]`).classList.add("active");
+function addFunds() {
+    const randomAmount = Math.floor(Math.random() * 10000) + 1000; // $1000 - $11000
+    balance += randomAmount;
+    updateBalanceDisplay();
+}
+
+function sendMoney() {
+    if (balance <= 0) {
+        alert("Not enough funds!");
+        return;
+    }
+    const sendAmount = Math.floor(Math.random() * (balance / 2)) + 1;
+    balance -= sendAmount;
+    updateBalanceDisplay();
+    alert(`Sent $${sendAmount.toLocaleString()} successfully!`);
+}
+
+// On page load
+window.onload = function() {
+    let fakeStart = 1000;
+    let fakeEnd = 98234;
+    let duration = 3000; // 3 seconds
+    let startTime = null;
+
+    function animateBalance(timestamp) {
+        if (!startTime) startTime = timestamp;
+        const progress = timestamp - startTime;
+        const percent = Math.min(progress / duration, 1);
+        balance = Math.floor(fakeStart + (fakeEnd - fakeStart) * percent);
+        updateBalanceDisplay();
+
+        if (percent < 1) {
+            requestAnimationFrame(animateBalance);
+        }
     }
 
-    // Initialize with the first tab active
-    switchTab("tab-1");
-
-    // Add event listeners to each tab
-    tabs.forEach(tab => {
-        tab.addEventListener("click", () => {
-            const tabId = tab.getAttribute("data-tab");
-            switchTab(tabId);
-        });
-    });
-});
+    requestAnimationFrame(animateBalance);
+}
